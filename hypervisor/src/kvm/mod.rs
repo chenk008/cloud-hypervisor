@@ -909,6 +909,7 @@ impl KvmHypervisor {
     /// Create a hypervisor based on Kvm
     #[allow(clippy::new_ret_no_self)]
     pub fn new() -> hypervisor::Result<Arc<dyn hypervisor::Hypervisor>> {
+        // 如果打开kvm失败，则map_err
         let kvm_obj = Kvm::new().map_err(|e| hypervisor::HypervisorError::VmCreate(e.into()))?;
         let api_version = kvm_obj.get_api_version();
 
@@ -916,6 +917,7 @@ impl KvmHypervisor {
             return Err(hypervisor::HypervisorError::IncompatibleApiVersion);
         }
 
+        // Arc 原子引用计数
         Ok(Arc::new(KvmHypervisor { kvm: kvm_obj }))
     }
     /// Check if the hypervisor is available

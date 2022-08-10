@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
+//自定义构建脚本，在项目编译之前执行
+
 #[macro_use(crate_version)]
 extern crate clap;
 

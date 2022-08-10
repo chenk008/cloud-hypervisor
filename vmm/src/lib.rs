@@ -312,6 +312,7 @@ pub fn start_vmm_thread(
 
                 vmm.setup_signal_handler()?;
 
+                // http服务
                 vmm.control_loop(
                     Arc::new(api_receiver),
                     #[cfg(feature = "gdb")]

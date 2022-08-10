@@ -25,8 +25,11 @@ use vmm_sys_util::eventfd::EventFd;
 use vmm_sys_util::signal::block_signal;
 use vmm_sys_util::terminal::Terminal;
 
+// 使用Error派生代码
 #[derive(Error, Debug)]
 enum Error {
+    // source指定了 错误源
+    // thiserror 使用 #[error(...)] 为结构体或者枚举生成自定义错误消息
     #[error("Failed to create API EventFd: {0}")]
     CreateApiEventFd(#[source] std::io::Error),
     #[cfg(feature = "gdb")]
@@ -132,6 +135,7 @@ fn create_app<'a>(
     let app = Command::new("cloud-hypervisor")
         // 'BUILT_VERSION' is set by the build script 'build.rs' at
         // compile time
+        //展开为编译时指定的环境变量的值.如果变量不存在,那就是编译错误.
         .version(env!("BUILT_VERSION"))
         .author(crate_authors!())
         .about("Launch a cloud-hypervisor VMM.")
@@ -416,6 +420,7 @@ fn start_vmm(cmd_arguments: ArgMatches) -> Result<Option<String>, Error> {
     let log_file: Box<dyn std::io::Write + Send> = if let Some(file) =
         cmd_arguments.value_of("log-file")
     {
+        // 如果设置了log-file，就匹配了Some
         Box::new(std::fs::File::create(std::path::Path::new(file)).map_err(Error::LogFileCreation)?)
     } else {
         Box::new(std::io::stderr())
