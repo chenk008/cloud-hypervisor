@@ -420,7 +420,7 @@ fn start_vmm(cmd_arguments: ArgMatches) -> Result<Option<String>, Error> {
     let log_file: Box<dyn std::io::Write + Send> = if let Some(file) =
         cmd_arguments.value_of("log-file")
     {
-        // 如果设置了log-file，就匹配了Some
+        // 如果cmd_arguments 设置了log-file，就匹配了Some
         Box::new(std::fs::File::create(std::path::Path::new(file)).map_err(Error::LogFileCreation)?)
     } else {
         Box::new(std::io::stderr())
