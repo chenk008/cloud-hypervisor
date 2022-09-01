@@ -410,6 +410,9 @@ fn create_app<'a>(
 }
 
 fn start_vmm(cmd_arguments: ArgMatches) -> Result<Option<String>, Error> {
+    // 根据用户使用“详细”标志的次数来改变输出
+    // (比如 'myprog -v -v -v' or 'myprog -vvv' vs 'myprog -v'
+    println!("log level: {:?}", cmd_arguments.occurrences_of("v"));
     let log_level = match cmd_arguments.occurrences_of("v") {
         0 => LevelFilter::Warn,
         1 => LevelFilter::Info,
@@ -417,6 +420,10 @@ fn start_vmm(cmd_arguments: ArgMatches) -> Result<Option<String>, Error> {
         _ => LevelFilter::Trace,
     };
 
+    let log_file1 = cmd_arguments.value_of("log-file");
+    if log_file1.is_some(){
+        println!("log file: {:?}", log_file1.unwrap());
+    }
     let log_file: Box<dyn std::io::Write + Send> = if let Some(file) =
         cmd_arguments.value_of("log-file")
     {
@@ -623,6 +630,7 @@ fn main() {
             0
         }
         Err(e) => {
+            println!("failed on main");
             eprintln!("{}", e);
             1
         }

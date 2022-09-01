@@ -13,7 +13,7 @@ use once_cell::sync::Lazy;
 use seccompiler::{apply_filter, SeccompAction};
 use serde_json::Error as SerdeError;
 use std::collections::BTreeMap;
-use std::fs::File;
+use std::fs::{File, self};
 use std::os::unix::io::{IntoRawFd, RawFd};
 use std::os::unix::net::UnixListener;
 use std::panic::AssertUnwindSafe;
@@ -342,6 +342,11 @@ pub fn start_http_path_thread(
 ) -> Result<thread::JoinHandle<Result<()>>> {
     let socket_path = PathBuf::from(path);
     let socket_fd = UnixListener::bind(socket_path).map_err(VmmError::CreateApiServerSocket)?;
+    let d = fs::remove_file(path);
+    match d {
+        Ok(_) => {},
+        Err(err) => {println!("failed to delete socket path {:?}",err)},
+    };
     let server =
         HttpServer::new_from_fd(socket_fd.into_raw_fd()).map_err(VmmError::CreateApiServer)?;
     start_http_thread(
